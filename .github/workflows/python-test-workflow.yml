@@ -46,4 +46,3 @@ steps:
     with:
       name: pytest-report
       path: test-report.xml
-```
