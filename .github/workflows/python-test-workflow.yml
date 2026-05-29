@@ -1,23 +1,49 @@
-name: Python test
+name: Python Test Workflow
 
-on: [push]
+on:
+push:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: セットアップ
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest
-      - name: Lint
-        run: |
-          flake8 . --count --show-source --statistics --exclude=./test_*.py
-      - name: Test
-        run: |
-          pytest test_*.py
+build:
+runs-on: ubuntu-latest
+
+```
+steps:
+  # リポジトリを取得
+  - name: Checkout repository
+    uses: actions/checkout@v4
+
+  # Python環境を準備
+  - name: Setup Python
+    uses: actions/setup-python@v5
+    with:
+      python-version: '3.x'
+
+  # 必要ライブラリをインストール
+  - name: Install dependencies
+    run: |
+      python -m pip install --upgrade pip
+      pip install flake8 pytest
+
+  # コードの静的解析
+  - name: Run flake8 lint check
+    run: |
+      flake8 . --count --show-source --statistics --exclude=test_*.py
+
+  # テストファイル一覧表示
+  - name: Show test files
+    run: |
+      ls ./test_*.py
+
+  # テスト実行＆レポート生成
+  - name: Run pytest and generate report
+    run: |
+      pytest test_*.py --junitxml=test-report.xml
+
+  # レポートをartifactとして保存
+  - name: Upload test report
+    uses: actions/upload-artifact@v4
+    with:
+      name: pytest-report
+      path: test-report.xml
+```
